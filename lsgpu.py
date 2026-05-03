@@ -618,7 +618,7 @@ info shown per GPU:
   AMD: utilization %, memory, temperature, power draw (via sysfs)
   output ports with connected monitor (manufacturer, model, size from EDID)
 
-source: https://github.com/lsgpu/lsgpu
+source: https://github.com/AGuyMarc/lsgpu
 license: GPL-2.0""",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
