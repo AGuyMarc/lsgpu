@@ -1,0 +1,86 @@
+.TH LSGPU 1 "May 2026" "lsgpu 0.1.0" "User Commands"
+.SH NAME
+lsgpu \- list graphics cards with details, outputs, and connected monitors
+.SH SYNOPSIS
+.B lsgpu
+[\fIOPTIONS\fR]
+.SH DESCRIPTION
+.B lsgpu
+lists all graphics cards (GPUs) with their driver, VRAM, PCI address,
+and for NVIDIA cards: utilization, memory usage, temperature, and power draw.
+Each GPU output port is listed with its connection status and, when connected,
+the monitor's manufacturer, model, and size (parsed from EDID).
+.PP
+GPU information is obtained from
+.I /sys/class/drm
+and
+.BR lspci (8).
+NVIDIA runtime stats are obtained from
+.BR nvidia-smi (1)
+when available.
+Monitor identification uses EDID data from
+.IR /sys/class/drm/card*\-*/edid .
+.PP
+.B lsgpu
+is similar in spirit to
+.BR lscpu (1),
+.BR lsusb (8),
+and
+.BR lspci (8),
+but focused on graphics cards and their display outputs.
+.SH OPTIONS
+.TP
+.B \-\-json
+Output all GPU information as JSON.
+.TP
+.B \-\-short\fR, \fB\-s
+Compact output with one line per GPU.
+.TP
+.B \-\-version\fR, \fB\-V
+Show version number and exit.
+.TP
+.B \-\-help\fR, \fB\-h
+Show help message and exit.
+.SH OUTPUT
+.TP
+.B GRAPHICS CARDS
+For each GPU: card name, full GPU model, driver, VRAM size, and NVIDIA runtime
+stats (utilization %, memory used/total, temperature, power draw).
+Below each GPU, output ports are listed with connection status and connected
+monitor details.
+.SH EXAMPLES
+.nf
+.B lsgpu
+.B lsgpu \-\-short
+.B lsgpu \-\-json
+.B lsgpu \-\-json | jq '.[].name'
+.fi
+.SH FILES
+.TP
+.I /sys/class/drm/card[0\-9]
+DRM card entries for each GPU.
+.TP
+.I /sys/class/drm/card*\-*/edid
+EDID binary data for each output port.
+.TP
+.I /sys/class/drm/card*\-*/status
+Connection status (connected/disconnected).
+.TP
+.I /sys/class/drm/card*/device/mem_info_vram_total
+Total VRAM in bytes (NVIDIA/AMD).
+.TP
+.I /sys/class/drm/card*/device/driver
+Kernel driver in use (nvidia, i915, amdgpu, etc.).
+.SH SEE ALSO
+.BR lsscreen (1),
+.BR lspci (8),
+.BR lsusb (8),
+.BR lscpu (1),
+.BR nvidia-smi (1),
+.BR xrandr (1)
+.SH BUGS
+Report bugs at https://github.com/lsgpu/lsgpu/issues
+.SH AUTHOR
+Guy-Marc Aprin <2026@gm.casa>
+.SH LICENSE
+GPL\-2.0. See LICENSE for the full text.
