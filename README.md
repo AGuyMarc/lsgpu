@@ -13,7 +13,7 @@ A useful CLI tool for Linux users and admins. Zero-dependency — no CUDA, no RO
 - **Output mapping**: each port mapped to its connected monitor via EDID
 - **Monitor identification**: manufacturer, model, serial, diagonal size
 - **JSON output** for scripting
-- No external Python dependencies, works with Python 3.6+
+- No external Python dependencies, works with Python 3.7+
 
 ## Installation
 
@@ -59,7 +59,7 @@ Total: 3 GPU(s), 6 output(s) connected
 
 ## Requirements
 
-- Python 3.6+
+- Python 3.7+
 - Linux with `/sys/class/drm`
 - `lspci` (from pciutils)
 - `nvidia-smi` (optional, for NVIDIA stats)
