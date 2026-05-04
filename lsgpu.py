@@ -27,7 +27,10 @@ from typing import List, Optional, Dict
 
 __version__ = "0.1.0"
 
-# PNP manufacturer IDs
+# PNP manufacturer IDs (subset of the official PNP ID registry)
+# Source: https://uefi.org/PNP_ID_List
+# History: https://github.com/onkoe/pnpid/blob/main/list.csv
+# See also: /usr/share/hwdata/pnp.ids (hwdata package)
 PNP_MANUFACTURERS = {
     "AAC": "AcerView", "ACR": "Acer", "AOC": "AOC", "AUS": "ASUS",
     "BNQ": "BenQ", "CMN": "Chimei Innolux", "DEL": "Dell",
