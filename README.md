@@ -4,6 +4,8 @@ List GPUs with details, outputs, and connected monitors.
 
 Like `lscpu`, `lsusb`, `lspci` — but for graphics cards.
 
+A useful CLI tool for Linux users and admins. Zero-dependency — no CUDA, no ROCm, no pycuda needed.
+
 ## Features
 
 - **GPU details**: name, driver, PCI address, VRAM
