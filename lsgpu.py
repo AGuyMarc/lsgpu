@@ -137,7 +137,11 @@ class GPU:
 
 
 def _load_overrides():
-    """Load overrides from config."""
+    """Load monitor overrides from config (model name, diagonal, serial).
+
+    Searches ~/.config/lsdisplay/overrides.json then /etc/lsdisplay/overrides.json.
+    Keys prefixed with '_' are treated as comments and ignored.
+    """
     home = os.environ.get("HOME", os.path.expanduser("~"))
     paths = [
         os.path.join(home, ".config/lsdisplay/overrides.json"),
@@ -155,6 +159,7 @@ def _load_overrides():
                 pass
     return {}
 
+# Lazy-loaded singleton for overrides config
 _OVERRIDES = None
 def get_overrides():
     global _OVERRIDES
@@ -164,41 +169,54 @@ def get_overrides():
 
 
 def parse_edid(data: bytes) -> Monitor:
-    """Parse EDID binary data to identify a monitor."""
+    """Parse EDID binary data to identify a monitor.
+
+    EDID is a 128-byte (minimum) structure stored in monitor firmware.
+    Bytes 8-9: manufacturer ID (3 letters packed in 2 bytes, 5 bits each, A=1).
+    Bytes 10-11: product code (little-endian).
+    Bytes 21-22: max horizontal/vertical size in cm (coarse fallback).
+    Bytes 54-125: four 18-byte descriptor blocks (timing or metadata).
+    """
     if len(data) < 128:
         return Monitor()
 
+    # Decode 3-letter PNP manufacturer ID from bytes 8-9 (5 bits per char, A=1=0x41)
     m1, m2 = data[8], data[9]
     mfg_id = chr(((m1 >> 2) & 0x1F) + 64) + chr(((m1 & 0x3) << 3 | (m2 >> 5)) + 64) + chr((m2 & 0x1F) + 64)
 
     name = ""
     serial_str = ""
     w_mm, h_mm = 0, 0
+    # Walk the four 18-byte descriptor blocks starting at offset 54
     for i in range(4):
         offset = 54 + i * 18
         if offset + 18 > len(data):
             break
         if data[offset] != 0 or data[offset + 1] != 0:
-            # Detailed timing — extract physical size in mm
+            # Detailed timing descriptor — physical screen size in mm
+            # byte 12: low 8 bits of width, byte 13: low 8 bits of height
+            # byte 14: high nibble = width[11:8], low nibble = height[11:8]
             w = data[offset + 12] | ((data[offset + 14] & 0xF0) << 4)
             h = data[offset + 13] | ((data[offset + 14] & 0x0F) << 8)
             if w > 0 and h > 0 and w_mm == 0:
                 w_mm, h_mm = w, h
         else:
+            # Display descriptor: tag at byte 3 identifies the content
             tag = data[offset + 3]
             text = data[offset + 5:offset + 18].decode("ascii", errors="replace").strip().rstrip("\n\r")
-            if tag == 0xFC:
+            if tag == 0xFC:  # Monitor name descriptor
                 name = text
-            elif tag == 0xFF:
+            elif tag == 0xFF:  # Serial number descriptor
                 serial_str = text
 
-    # Fallback to bytes 21-22
+    # Bytes 21-22 give max H/V size in cm — fallback when no detailed timing
     if w_mm == 0:
         w_mm, h_mm = data[21] * 10, data[22] * 10
 
+    # Diagonal in inches from Pythagorean theorem on mm dimensions
     diagonal = round(math.sqrt(w_mm**2 + h_mm**2) / 25.4) if w_mm and h_mm else 0
 
-    # Apply overrides
+    # Allow config-file overrides keyed by manufacturer + product code
     product_code = data[10] | (data[11] << 8)
     key = f"{mfg_id}{product_code:04X}"
     overrides = get_overrides()
@@ -220,7 +238,11 @@ def parse_edid(data: bytes) -> Monitor:
 
 
 def get_nvidia_stats(pci_addr: str) -> Optional[NvidiaStats]:
-    """Get runtime stats from nvidia-smi for a given PCI address."""
+    """Get runtime stats from nvidia-smi for a given PCI address.
+
+    Uses nvidia-smi CSV mode to query a single GPU by PCI bus ID,
+    avoiding XML parsing overhead.
+    """
     try:
         out = subprocess.check_output(
             ["nvidia-smi", "--query-gpu=utilization.gpu,memory.used,memory.total,temperature.gpu,power.draw",
@@ -251,7 +273,12 @@ def _read_sysfs_int(path: str, default: int = 0) -> int:
 
 
 def get_amd_stats(card_path: str) -> Optional[AmdStats]:
-    """Get runtime stats from sysfs for an AMD GPU."""
+    """Get runtime stats from sysfs for an AMD GPU.
+
+    AMD GPUs expose stats under /sys/class/drm/cardN/device/:
+      gpu_busy_percent, mem_info_vram_used, mem_info_vram_total (bytes),
+      hwmon/hwmonN/temp1_input (millidegrees), power1_average (microwatts).
+    """
     device_path = os.path.join(card_path, "device")
 
     gpu_busy = os.path.join(device_path, "gpu_busy_percent")
@@ -262,7 +289,7 @@ def get_amd_stats(card_path: str) -> Optional[AmdStats]:
     mem_used = _read_sysfs_int(os.path.join(device_path, "mem_info_vram_used"))
     mem_total = _read_sysfs_int(os.path.join(device_path, "mem_info_vram_total"))
 
-    # Temperature: find hwmon directory
+    # hwmon subdirectory contains thermal and power sensors
     temperature = 0
     power_draw = 0.0
     hwmon_dirs = glob_mod.glob(os.path.join(device_path, "hwmon", "hwmon*"))
@@ -284,7 +311,13 @@ def get_amd_stats(card_path: str) -> Optional[AmdStats]:
 
 
 def get_gpu_processes() -> Dict[str, List[GpuProcess]]:
-    """Get processes running on NVIDIA GPUs. Returns dict keyed by GPU index."""
+    """Get processes running on NVIDIA GPUs.
+
+    Returns dict keyed by PCI address (lowercase) so callers can match
+    processes to the correct GPU. Two strategies:
+    1. Query by UUID, then map UUID->PCI for multi-GPU correctness.
+    2. Fallback: query without UUID (keyed by "" for single-GPU setups).
+    """
     processes: Dict[str, List[GpuProcess]] = {}
     try:
         out = subprocess.check_output(
@@ -296,7 +329,7 @@ def get_gpu_processes() -> Dict[str, List[GpuProcess]]:
         if not out:
             return processes
 
-        # We need to map GPU UUID to PCI address. Get the mapping.
+        # Build UUID -> PCI address mapping for multi-GPU disambiguation
         uuid_out = subprocess.check_output(
             ["nvidia-smi", "--query-gpu=gpu_uuid,pci.bus_id",
              "--format=csv,noheader"],
@@ -322,7 +355,7 @@ def get_gpu_processes() -> Dict[str, List[GpuProcess]]:
     except (subprocess.CalledProcessError, FileNotFoundError, ValueError):
         pass
 
-    # Also try simpler approach: query by pid,name,used_gpu_memory without UUID
+    # Fallback for older nvidia-smi or single-GPU: query without UUID
     if not processes:
         try:
             out = subprocess.check_output(
@@ -340,7 +373,7 @@ def get_gpu_processes() -> Dict[str, List[GpuProcess]]:
                             name=parts[1],
                             used_memory_mb=int(parts[2]) if parts[2].strip() else 0,
                         )
-                        # Put under empty key (will be assigned to first GPU)
+                        # Empty key = unassigned; scan_gpus() assigns to first GPU
                         processes.setdefault("", []).append(proc)
         except (subprocess.CalledProcessError, FileNotFoundError, ValueError):
             pass
@@ -349,11 +382,16 @@ def get_gpu_processes() -> Dict[str, List[GpuProcess]]:
 
 
 def _sparkline(values: List[int], max_val: int = 100) -> str:
-    """Generate a sparkline string from a list of values."""
+    """Generate a sparkline string from a list of values.
+
+    Maps each value to one of 8 Unicode block characters (▁..█)
+    proportional to max_val.
+    """
     if not values:
         return ""
     chars = []
     for v in values:
+        # Scale value to index 0..7 in SPARK_CHARS, clamped
         idx = int(v / max_val * (len(SPARK_CHARS) - 1))
         idx = max(0, min(idx, len(SPARK_CHARS) - 1))
         chars.append(SPARK_CHARS[idx])
@@ -361,16 +399,25 @@ def _sparkline(values: List[int], max_val: int = 100) -> str:
 
 
 def scan_gpus() -> List[GPU]:
-    """Scan /sys/class/drm for GPUs and their outputs."""
+    """Scan /sys/class/drm for GPUs and their outputs.
+
+    /sys/class/drm contains entries like:
+      card0           -> GPU device (symlink to PCI device)
+      card0-HDMI-A-1  -> output port with status and edid files
+      card0-DP-1      -> another output port
+    This function enumerates cardN entries, reads GPU info via lspci
+    and sysfs, then matches cardN-* entries as output ports.
+    """
     drm_dir = "/sys/class/drm"
     if not os.path.isdir(drm_dir):
         return []
 
-    # Get GPU processes up front
+    # Pre-fetch NVIDIA process list (one nvidia-smi call for all GPUs)
     all_processes = get_gpu_processes()
 
     gpus = []
     for entry in sorted(os.listdir(drm_dir)):
+        # Only match "cardN" entries, not "cardN-DP-1" output entries
         if not re.match(r"^card\d+$", entry):
             continue
 
@@ -379,23 +426,24 @@ def scan_gpus() -> List[GPU]:
 
         gpu = GPU(card=entry)
 
-        # PCI address and GPU name
+        # Resolve PCI address from sysfs symlink, then query lspci for the name
         try:
             pci_addr = os.path.basename(os.readlink(device_link))
             gpu.pci_address = pci_addr
             lspci_out = subprocess.check_output(
                 ["lspci", "-s", pci_addr], text=True, stderr=subprocess.DEVNULL
             ).strip()
+            # Strip "XX:XX.X VGA compatible controller: " prefix from lspci output
             gpu.name = re.sub(r"^[0-9a-f:.]+\s+\S+\s+\S+\s+controller:\s*", "", lspci_out, flags=re.IGNORECASE)
         except (OSError, subprocess.CalledProcessError):
             pass
 
-        # Driver
+        # Driver name from the driver symlink (e.g. "nvidia", "amdgpu", "i915")
         driver_link = os.path.join(device_link, "driver")
         if os.path.islink(driver_link):
             gpu.driver = os.path.basename(os.readlink(driver_link))
 
-        # VRAM
+        # VRAM total (AMD exposes this directly in sysfs; NVIDIA uses nvidia-smi)
         vram_file = os.path.join(device_link, "mem_info_vram_total")
         if os.path.exists(vram_file):
             try:
@@ -404,11 +452,11 @@ def scan_gpus() -> List[GPU]:
             except (IOError, ValueError):
                 pass
 
-        # NVIDIA stats
+        # NVIDIA: get stats via nvidia-smi and match processes by PCI suffix
         if gpu.driver == "nvidia":
             gpu.nvidia_stats = get_nvidia_stats(gpu.pci_address)
-            # Assign processes by matching PCI address suffix (bus:slot.func)
-            # sysfs: "0000:82:00.0", nvidia-smi: "00000000:82:00.0"
+            # Match on bus:slot.func suffix since domain width differs
+            # (sysfs "0000:82:00.0" vs nvidia-smi "00000000:82:00.0")
             pci_suffix = gpu.pci_address.lower().split(":")[-2] + ":" + gpu.pci_address.lower().split(":")[-1]
             for key, procs in all_processes.items():
                 if key == "" and len(all_processes) == 1:
@@ -419,11 +467,10 @@ def scan_gpus() -> List[GPU]:
                         gpu.processes = procs
                         break
 
-        # AMD stats
         if gpu.driver in ("amdgpu", "radeon"):
             gpu.amd_stats = get_amd_stats(card_path)
 
-        # Scan outputs
+        # Scan output ports: entries named "cardN-<connector>" (e.g. card0-HDMI-A-1)
         for sub in sorted(os.listdir(drm_dir)):
             if sub.startswith(entry + "-"):
                 port_name = sub[len(entry) + 1:]
@@ -437,6 +484,7 @@ def scan_gpus() -> List[GPU]:
                 except (IOError, PermissionError):
                     pass
 
+                # Parse EDID blob if present — also confirms connection
                 monitor = None
                 edid_file = os.path.join(port_dir, "edid")
                 if os.path.exists(edid_file):
@@ -528,11 +576,16 @@ def print_short(gpus: List[GPU]):
 
 
 def watch_gpus(interval=2):
-    """Monitor GPU stats in real-time with sparkline history."""
+    """Monitor GPU stats in real-time with sparkline history.
+
+    Uses ANSI escape codes to redraw in-place (cursor home without clear
+    to avoid flicker). Maintains a rolling window of utilization values
+    per GPU, rendered as a sparkline beside the progress bar.
+    """
     import time
     from datetime import datetime
 
-    # History: card -> list of utilization values (last 20)
+    # Rolling utilization history per card for sparkline rendering
     history: Dict[str, List[int]] = {}
     max_history = 20
 
@@ -540,20 +593,21 @@ def watch_gpus(interval=2):
     print("=" * 27)
     print()
 
-    # First clear, then just move cursor home (no flash)
+    # ANSI: clear screen + cursor home on first frame only
     print("\033[2J\033[H", end="")
     try:
         while True:
-            print("\033[H", end="")  # cursor home, no clear
+            # ANSI cursor home — overwrite previous frame without clearing
+            print("\033[H", end="")
             ts = datetime.now().strftime("%H:%M:%S")
             print(f"GPU MONITOR \u2014 {ts} (Ctrl+C to stop)    ")
             print()
 
             gpus = scan_gpus()
             for gpu in gpus:
+                # Extract short name from bracket notation (e.g. "[GeForce RTX 4090]")
                 name_short = gpu.name.split("[")[-1].rstrip("]") if "[" in gpu.name else gpu.name
 
-                # Get stats (nvidia or amd)
                 has_stats = gpu.nvidia_stats or gpu.amd_stats
                 if not has_stats:
                     print(f"  {gpu.card} {name_short} ({gpu.driver})")
@@ -572,7 +626,7 @@ def watch_gpus(interval=2):
                     temp = gpu.amd_stats.temperature
                     power = gpu.amd_stats.power_draw
 
-                # Update history
+                # Append to rolling history and trim to max_history
                 if gpu.card not in history:
                     history[gpu.card] = []
                 history[gpu.card].append(util)
@@ -581,12 +635,11 @@ def watch_gpus(interval=2):
 
                 spark = _sparkline(history[gpu.card])
 
-                # GPU utilization bar
+                # Render fixed-width progress bars (30 chars) using block characters
                 bar_w = 30
                 gpu_filled = int(util / 100 * bar_w)
                 gpu_bar = "\u2588" * gpu_filled + "\u2591" * (bar_w - gpu_filled)
 
-                # Memory bar
                 mem_pct = mem_used / mem_total * 100 if mem_total else 0
                 mem_filled = int(mem_pct / 100 * bar_w)
                 mem_bar = "\u2588" * mem_filled + "\u2591" * (bar_w - mem_filled)
