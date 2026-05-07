@@ -1,4 +1,4 @@
-lsgpu (0.1.0-1) unstable; urgency=medium
+lsgpu (0.1.1-1) unstable; urgency=medium
 
   * Initial release
   * NVIDIA stats via nvidia-smi

@@ -6,6 +6,17 @@ Similar to lscpu, lsusb, lspci but for graphics cards.
 Shows GPU name, driver, VRAM, utilization, temperature, power draw,
 and maps each output port to the connected monitor via EDID.
 
+Author: Guy-Marc Aprin <2026@gm.casa>
+
+  « La perfection est atteinte non quand il n'y a plus rien à ajouter,
+    mais quand il n'y a plus rien à retirer. »
+  « L'essentiel est invisible pour les yeux. »
+    — Antoine de Saint-Exupéry
+
+  "Perfection is achieved not when there is nothing more to add,
+   but when there is nothing left to take away."
+  "What is essential is invisible to the eye."
+
 Usage:
     lsgpu              Full output
     lsgpu --json       JSON output for scripting
@@ -30,7 +41,31 @@ except ImportError:
     sys.exit(1)
 from typing import List, Optional, Dict
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
+
+def _get_version_string() -> str:
+    """Build version string with build date from git or file modification time."""
+    import locale
+    try:
+        locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
+    except locale.Error:
+        pass
+    try:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        ts = subprocess.check_output(
+            ["git", "log", "-1", "--format=%ct"], text=True,
+            stderr=subprocess.DEVNULL, cwd=script_dir
+        ).strip()
+        from datetime import datetime
+        dt = datetime.fromtimestamp(int(ts))
+    except Exception:
+        try:
+            from datetime import datetime
+            dt = datetime.fromtimestamp(os.path.getmtime(__file__))
+        except Exception:
+            return __version__
+    day_name = dt.strftime("%a").lower().rstrip(".")
+    return f"{__version__} ({dt.strftime(f'%Y-%m-%d {day_name} %Hh%Mm%Ss')})"
 
 # PNP manufacturer IDs (subset of the official PNP ID registry)
 # Source: https://uefi.org/PNP_ID_List
@@ -556,7 +591,7 @@ def print_gpus(gpus: List[GPU], show_all: bool = False):
     # Summary
     total_gpu = len(gpus)
     total_out = sum(len(g.connected_outputs) for g in gpus)
-    print(f"Total: {total_gpu} GPU(s), {total_out} output(s) connected")
+    print(f"Total: {total_gpu} GPU{'s' if total_gpu != 1 else ''}, {total_out} output{'s' if total_out != 1 else ''} connected")
 
 
 def print_short(gpus: List[GPU]):
@@ -688,7 +723,7 @@ license: GPL-2.0""",
     parser.add_argument("--all", "-a", action="store_true", help="show all outputs including disconnected")
     parser.add_argument("--watch", "-w", nargs="?", const=2, type=int, metavar="SEC",
                         help="real-time monitoring (default: 2s interval)")
-    parser.add_argument("--version", "-V", action="version", version=f"%(prog)s {__version__}")
+    parser.add_argument("--version", "-V", action="version", version=f"%(prog)s {_get_version_string()}")
     args = parser.parse_args()
 
     if args.watch is not None:
