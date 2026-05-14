@@ -1,3 +1,11 @@
+lsgpu (0.1.3-1) unstable; urgency=medium
+
+  * Lower debhelper-compat level from 13 to 11 in Build-Depends so the
+    source package builds out of the box on Ubuntu 22.04 LTS. Reported
+    by Creteil (bigbob) in lsdisplay#2 (same root cause).
+
+ -- Guy-Marc APRIN <2026@gm.casa>  Fri, 15 May 2026 00:21:00 +0200
+
 lsgpu (0.1.2-1) unstable; urgency=medium
 
   * Add SPDX license header (GPL-2.0-or-later)
