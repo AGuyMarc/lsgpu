@@ -4,3 +4,9 @@ __pycache__/
 dist/
 build/
 lsgpu_0.1.0-1_all.deb
+*.deb
+*.info
+debian_backup/
+*.bak
+notes_*.md
+__pycache__/
