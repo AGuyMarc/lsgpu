@@ -2,9 +2,11 @@
 
 List GPUs with details, outputs, and connected monitors.
 
-Like `lscpu`, `lsusb`, `lspci` — but for graphics cards.
+Like `lscpu`, `lsusb`, `lspci`, `lsblk`, `lsmem` — but for graphics cards.
 
 A useful CLI tool for Linux users and admins. Zero-dependency — no CUDA, no ROCm, no pycuda needed.
+
+**Companion tool:** [`lsdisplay`](https://github.com/AGuyMarc/lsdisplay) — list the connected displays/monitors that those GPUs drive.
 
 ## Features
 
@@ -87,6 +89,20 @@ Total: 3 GPU(s), 6 output(s) connected
 - Linux with `/sys/class/drm`
 - `lspci` (from pciutils)
 - `nvidia-smi` (optional, for NVIDIA stats)
+
+## See also
+
+Hardware enumeration `ls*` family on Linux:
+
+- [`lsdisplay`](https://github.com/AGuyMarc/lsdisplay) — connected displays/monitors (companion to this tool)
+- `lscpu` — CPU architecture info
+- `lspci` — PCI devices
+- `lsusb` — USB devices
+- `lsblk` — block devices (disks, partitions)
+- `lsmem` — memory ranges
+- `lsmod` — kernel modules
+- `lsipc` — IPC facilities
+- `lsns` — namespaces
 
 ## License
 
