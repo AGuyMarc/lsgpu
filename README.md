@@ -17,7 +17,31 @@ A useful CLI tool for Linux users and admins. Zero-dependency — no CUDA, no RO
 
 ## Installation
 
+### Debian / Ubuntu (.deb)
+
+Download the `.deb` from the [Releases page](https://github.com/AGuyMarc/lsgpu/releases/latest), then:
+
 ```bash
+sudo dpkg -i lsgpu_X.Y.Z-1_all.deb
+```
+
+The package installs `/usr/bin/lsgpu`, the man page `lsgpu(1)`, and documentation.
+
+### Arch Linux / Manjaro (AUR)
+
+Available in the AUR thanks to [@seraf1](https://aur.archlinux.org/account/seraf1):
+
+```bash
+yay -S lsgpu-git
+```
+
+Package page: https://aur.archlinux.org/packages/lsgpu-git
+
+### From source
+
+```bash
+git clone https://github.com/AGuyMarc/lsgpu
+cd lsgpu
 sudo cp lsgpu.py /usr/local/bin/lsgpu
 sudo chmod +x /usr/local/bin/lsgpu
 ```
