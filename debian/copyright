@@ -1,5 +1,5 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: lsgpu
+Upstream-Name: lsgpus
 Upstream-Contact: Guy-Marc APRIN <2026@gm.casa>
 Source: https://github.com/AGuyMarc/lsgpu
 

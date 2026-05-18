@@ -1,3 +1,21 @@
+lsgpus (0.2.0-1) unstable; urgency=medium
+
+  * Rename installed binary from /usr/bin/lsgpu to /usr/bin/lsgpus and
+    man page from lsgpu(1) to lsgpus(1), to avoid a name clash with the
+    lsgpu(1) tool shipped by the igt-gpu-tools package (low-level Intel
+    Graphics Tests utility, present in /usr/bin/lsgpu on both Arch and
+    Debian/Ubuntu). Reported by Philippe Séraphin (seraf1) while
+    packaging the AUR build.
+  * Debian source/binary package renamed from lsgpu to lsgpus to match.
+    Replaces/Breaks lsgpu (<< 0.2.0) so dpkg can clean-migrate users
+    of the v0.1.x .deb. Upgrade procedure documented in README.
+  * GitHub repository keeps its original name (AGuyMarc/lsgpu) so
+    existing links from the LinuxFr.org journal and elsewhere stay
+    valid; only the installed binary and the Debian package were
+    renamed.
+
+ -- Guy-Marc APRIN <2026@gm.casa>  Tue, 19 May 2026 01:00:00 +0200
+
 lsgpu (0.1.5-1) unstable; urgency=medium
 
   * Update README description to clarify dependency model: Python 3.7+ and

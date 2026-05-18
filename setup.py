@@ -4,8 +4,8 @@
 from setuptools import setup
 
 setup(
-    name="lsgpu",
-    version="0.1.5",
+    name="lsgpus",
+    version="0.2.0",
     description="List GPUs with details — like lscpu/lsusb but for graphics cards",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
@@ -15,7 +15,7 @@ setup(
     py_modules=["lsgpu"],
     entry_points={
         "console_scripts": [
-            "lsgpu=lsgpu:main",
+            "lsgpus=lsgpu:main",
         ],
     },
     python_requires=">=3.7",

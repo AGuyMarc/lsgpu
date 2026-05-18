@@ -1,14 +1,14 @@
 .\" SPDX-License-Identifier: GPL-2.0-or-later
 .\" Copyright (C) 2026 Guy-Marc APRIN <2026@gm.casa>
 .\" NB: contact email rotates yearly — 2027@gm.casa in 2027, etc.
-.TH LSGPU 1 "May 2026" "lsgpu 0.1.5" "User Commands"
+.TH LSGPUS 1 "May 2026" "lsgpus 0.2.0" "User Commands"
 .SH NAME
-lsgpu \- list graphics cards with details, outputs, and connected monitors
+lsgpus \- list graphics cards with details, outputs, and connected monitors
 .SH SYNOPSIS
-.B lsgpu
+.B lsgpus
 [\fIOPTIONS\fR]
 .SH DESCRIPTION
-.B lsgpu
+.B lsgpus
 lists all graphics cards (GPUs) with their driver, VRAM, PCI address,
 and for NVIDIA cards: utilization, memory usage, temperature, and power draw.
 Each GPU output port is listed with its connection status and, when connected,
@@ -24,13 +24,22 @@ when available.
 Monitor identification uses EDID data from
 .IR /sys/class/drm/card*\-*/edid .
 .PP
-.B lsgpu
+.B lsgpus
 is similar in spirit to
 .BR lscpu (1),
 .BR lsusb (8),
 and
 .BR lspci (8),
 but focused on graphics cards and their display outputs.
+.PP
+The binary is named
+.B lsgpus
+(with a trailing \(lqs\(rq) since v0.2.0, to avoid a name clash with the
+.BR lsgpu (1)
+utility shipped by
+.B igt-gpu-tools
+\(em a low-level debug/test tool for the Intel Graphics Tests framework
+(different audience, same Unix path namespace).
 .SH OPTIONS
 .TP
 .B \-\-json
@@ -53,10 +62,10 @@ Below each GPU, output ports are listed with connection status and connected
 monitor details.
 .SH EXAMPLES
 .nf
-.B lsgpu
-.B lsgpu \-\-short
-.B lsgpu \-\-json
-.B lsgpu \-\-json | jq '.[].name'
+.B lsgpus
+.B lsgpus \-\-short
+.B lsgpus \-\-json
+.B lsgpus \-\-json | jq '.[].name'
 .fi
 .SH FILES
 .TP
@@ -75,7 +84,10 @@ Total VRAM in bytes (NVIDIA/AMD).
 .I /sys/class/drm/card*/device/driver
 Kernel driver in use (nvidia, i915, amdgpu, etc.).
 .SH SEE ALSO
-.BR lsscreen (1),
+.BR lsdisplay (1),
+.BR lsgpu (1)
+from
+.BR igt-gpu-tools ,
 .BR lspci (8),
 .BR lsusb (8),
 .BR lscpu (1),
@@ -83,6 +95,9 @@ Kernel driver in use (nvidia, i915, amdgpu, etc.).
 .BR xrandr (1)
 .SH BUGS
 Report bugs at https://github.com/AGuyMarc/lsgpu/issues
+(GitHub repository keeps its original name
+.IR lsgpu
+\(em only the installed binary was renamed in v0.2.0).
 .SH AUTHOR
 Guy-Marc APRIN <2026@gm.casa>
 .br

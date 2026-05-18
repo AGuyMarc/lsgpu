@@ -45,7 +45,7 @@ except ImportError:
     sys.exit(1)
 from typing import List, Optional, Dict
 
-__version__ = "0.1.5"
+__version__ = "0.2.0"
 
 def _get_version_string() -> str:
     """Build version string with build date from git or file modification time."""
@@ -711,15 +711,15 @@ def watch_gpus(interval=2):
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="lsgpu",
+        prog="lsgpus",
         description="List graphics cards with driver, VRAM, utilization, and connected monitors.",
         epilog="""examples:
-  lsgpu              list all GPUs with connected outputs
-  lsgpu -a           list all GPUs with all outputs (including disconnected)
-  lsgpu --short      compact one-line-per-GPU output
-  lsgpu --json       JSON output for scripting
-  lsgpu --watch      real-time GPU monitoring (Ctrl+C to stop)
-  lsgpu --json | jq '.[].name'
+  lsgpus              list all GPUs with connected outputs
+  lsgpus -a           list all GPUs with all outputs (including disconnected)
+  lsgpus --short      compact one-line-per-GPU output
+  lsgpus --json       JSON output for scripting
+  lsgpus --watch      real-time GPU monitoring (Ctrl+C to stop)
+  lsgpus --json | jq '.[].name'
 
 info shown per GPU:
   name, PCI address, driver, VRAM

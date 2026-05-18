@@ -1,4 +1,4 @@
-Source: lsgpu
+Source: lsgpus
 Section: utils
 Priority: optional
 Maintainer: Guy-Marc APRIN <2026@gm.casa>
@@ -6,13 +6,18 @@ Build-Depends: debhelper-compat (= 11), python3
 Standards-Version: 4.6.2
 Homepage: https://github.com/AGuyMarc/lsgpu
 
-Package: lsgpu
+Package: lsgpus
 Architecture: all
-Depends: python3 (>= 3.6), ${misc:Depends}
+Depends: python3 (>= 3.7), ${misc:Depends}
 Recommends: pciutils, nvidia-utils
+Replaces: lsgpu (<< 0.2.0)
+Breaks: lsgpu (<< 0.2.0)
 Description: List GPUs with details, outputs, and connected monitors
- lsgpu lists all graphics cards with driver, VRAM, PCI address,
+ lsgpus lists all graphics cards with driver, VRAM, PCI address,
  and for NVIDIA: utilization, memory, temperature, power draw.
  Each output port is mapped to its connected monitor via EDID.
  Supports real-time monitoring (--watch), GPU process listing,
  AMD and NVIDIA stats, and sparkline history.
+ .
+ Binary renamed from lsgpu to lsgpus in v0.2.0 to avoid a clash with
+ the lsgpu(1) tool shipped by the igt-gpu-tools package.

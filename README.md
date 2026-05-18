@@ -1,10 +1,12 @@
-# lsgpu
+# lsgpus
 
 List GPUs with details, outputs, and connected monitors.
 
 Like `lscpu`, `lsusb`, `lspci`, `lsblk`, `lsmem` — but for graphics cards.
 
 A useful CLI tool for Linux users and admins. Zero-dependency — just Python 3.7+ and /sys/class/drm. Reads info from standard tools (nvidia-smi/rocm-smi) when present — no CUDA, no ROCm, no pycuda needed.
+
+> **Binary renamed in v0.2.0.** The installed command is now `lsgpus` (with a trailing `s`) instead of `lsgpu`, to avoid a name clash with the `lsgpu(1)` utility shipped by [`igt-gpu-tools`](https://gitlab.freedesktop.org/drm/igt-gpu-tools) on both Debian/Ubuntu and Arch. The GitHub repository keeps its original name (`AGuyMarc/lsgpu`).
 
 **Companion tool:** [`lsdisplay`](https://github.com/AGuyMarc/lsdisplay) — list the connected displays/monitors that those GPUs drive.
 
@@ -24,10 +26,17 @@ A useful CLI tool for Linux users and admins. Zero-dependency — just Python 3.
 Download the `.deb` from the [Releases page](https://github.com/AGuyMarc/lsgpu/releases/latest), then:
 
 ```bash
-sudo dpkg -i lsgpu_0.1.5-1_all.deb
+sudo dpkg -i lsgpus_0.2.0-1_all.deb
 ```
 
-The package installs `/usr/bin/lsgpu`, the man page `lsgpu(1)`, and documentation.
+The package installs `/usr/bin/lsgpus`, the man page `lsgpus(1)`, and documentation.
+
+**Upgrading from v0.1.x** (when the package was named `lsgpu`): the new package declares `Replaces: lsgpu (<< 0.2.0)` and `Breaks: lsgpu (<< 0.2.0)`, so `dpkg -i lsgpus_0.2.0-1_all.deb` cleanly removes the old `lsgpu` package on install. If you prefer an explicit cleanup first:
+
+```bash
+sudo apt remove lsgpu
+sudo dpkg -i lsgpus_0.2.0-1_all.deb
+```
 
 ### Arch Linux / Manjaro (AUR)
 
@@ -39,21 +48,23 @@ yay -S lsgpu-git
 
 Package page: https://aur.archlinux.org/packages/lsgpu-git
 
+(The AUR package name may follow the binary rename to `lsgpus-git` after seraf1's next update — check the AUR page for the current name.)
+
 ### From source
 
 ```bash
 git clone https://github.com/AGuyMarc/lsgpu
 cd lsgpu
-sudo cp lsgpu.py /usr/local/bin/lsgpu
-sudo chmod +x /usr/local/bin/lsgpu
+sudo cp lsgpu.py /usr/local/bin/lsgpus
+sudo chmod +x /usr/local/bin/lsgpus
 ```
 
 ## Usage
 
 ```bash
-lsgpu              # Full output
-lsgpu --short      # Compact one-line-per-GPU
-lsgpu --json       # JSON output
+lsgpus              # Full output
+lsgpus --short      # Compact one-line-per-GPU
+lsgpus --json       # JSON output
 ```
 
 ## Example output
@@ -95,6 +106,7 @@ Total: 3 GPU(s), 6 output(s) connected
 Hardware enumeration `ls*` family on Linux:
 
 - [`lsdisplay`](https://github.com/AGuyMarc/lsdisplay) — connected displays/monitors (companion to this tool)
+- `lsgpu(1)` from `igt-gpu-tools` — low-level Intel Graphics Tests utility (different audience)
 - `lscpu` — CPU architecture info
 - `lspci` — PCI devices
 - `lsusb` — USB devices

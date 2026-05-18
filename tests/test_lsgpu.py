@@ -97,12 +97,13 @@ class TestCLI(unittest.TestCase):
     def test_help(self):
         r = self._run("--help")
         self.assertEqual(r.returncode, 0)
-        self.assertIn("lsgpu", r.stdout)
+        self.assertIn("lsgpus", r.stdout)
 
     def test_version(self):
         r = self._run("--version")
         self.assertEqual(r.returncode, 0)
-        self.assertIn("1.", r.stdout)
+        self.assertIn("lsgpus", r.stdout)
+        self.assertIn("0.", r.stdout)
 
     def test_json_output(self):
         r = self._run("--json")
