@@ -1,3 +1,12 @@
+lsgpu (0.1.5-1) unstable; urgency=medium
+
+  * Update README description to clarify dependency model: Python 3.7+ and
+    /sys/class/drm only, reads info from standard tools (nvidia-smi/rocm-smi)
+    when present, but no CUDA / no ROCm / no pycuda required.
+  * Match GitHub repo description with the new README phrasing.
+
+ -- Guy-Marc APRIN <2026@gm.casa>  Mon, 18 May 2026 22:18:00 +0200
+
 lsgpu (0.1.4-1) unstable; urgency=medium
 
   * Fix Debian packaging regression introduced in 0.1.3:

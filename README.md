@@ -4,7 +4,7 @@ List GPUs with details, outputs, and connected monitors.
 
 Like `lscpu`, `lsusb`, `lspci`, `lsblk`, `lsmem` — but for graphics cards.
 
-A useful CLI tool for Linux users and admins. Zero-dependency — no CUDA, no ROCm, no pycuda needed.
+A useful CLI tool for Linux users and admins. Zero-dependency — just Python 3.7+ and /sys/class/drm. Reads info from standard tools (nvidia-smi/rocm-smi) when present — no CUDA, no ROCm, no pycuda needed.
 
 **Companion tool:** [`lsdisplay`](https://github.com/AGuyMarc/lsdisplay) — list the connected displays/monitors that those GPUs drive.
 
@@ -24,7 +24,7 @@ A useful CLI tool for Linux users and admins. Zero-dependency — no CUDA, no RO
 Download the `.deb` from the [Releases page](https://github.com/AGuyMarc/lsgpu/releases/latest), then:
 
 ```bash
-sudo dpkg -i lsgpu_X.Y.Z-1_all.deb
+sudo dpkg -i lsgpu_0.1.5-1_all.deb
 ```
 
 The package installs `/usr/bin/lsgpu`, the man page `lsgpu(1)`, and documentation.
