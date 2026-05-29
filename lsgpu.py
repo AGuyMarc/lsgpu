@@ -45,7 +45,7 @@ except ImportError:
     sys.exit(1)
 from typing import List, Optional, Dict
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 def _get_version_string() -> str:
     """Build version string with build date from git or file modification time."""
@@ -148,9 +148,10 @@ class GpuProcess:
 @dataclass
 class GPU:
     """Represents a graphics card."""
-    card: str = ""           # card0, card1, ...
+    card: str = ""           # card0, card1, ... (kernel DRM probe order)
     name: str = ""           # full GPU name
     pci_address: str = ""
+    nvidia_index: Optional[int] = None  # nvidia-smi GPU index (bus-sorted), NVIDIA only
     driver: str = ""
     vram_bytes: int = 0
     outputs: List[Output] = field(default_factory=list)
@@ -446,6 +447,29 @@ def _sparkline(values: List[int], max_val: int = 100) -> str:
     return "".join(chars)
 
 
+def get_nvidia_index_map() -> Dict[str, int]:
+    """Map 'bus:slot.func' suffix -> nvidia-smi GPU index.
+
+    nvidia-smi numbers GPUs by PCI bus id (ascending), counting NVIDIA cards
+    only — this differs from the kernel DRM 'cardN' numbering (probe order)
+    used here. One nvidia-smi call lets us cross-reference the two so the
+    output is unambiguous on multi-GPU boxes.
+    """
+    result: Dict[str, int] = {}
+    try:
+        out = subprocess.check_output(
+            ["nvidia-smi", "--query-gpu=index,pci.bus_id", "--format=csv,noheader"],
+            text=True, stderr=subprocess.DEVNULL)
+        for line in out.strip().splitlines():
+            parts = [p.strip() for p in line.split(",")]
+            if len(parts) == 2 and parts[0].isdigit():
+                suffix = ":".join(parts[1].lower().split(":")[-2:])
+                result[suffix] = int(parts[0])
+    except (OSError, subprocess.CalledProcessError, ValueError):
+        pass
+    return result
+
+
 def scan_gpus() -> List[GPU]:
     """Scan /sys/class/drm for GPUs and their outputs.
 
@@ -462,6 +486,8 @@ def scan_gpus() -> List[GPU]:
 
     # Pre-fetch NVIDIA process list (one nvidia-smi call for all GPUs)
     all_processes = get_gpu_processes()
+    # Map PCI suffix -> nvidia-smi index, to annotate each card unambiguously
+    nv_index = get_nvidia_index_map()
 
     gpus = []
     for entry in sorted(os.listdir(drm_dir)):
@@ -506,6 +532,7 @@ def scan_gpus() -> List[GPU]:
             # Match on bus:slot.func suffix since domain width differs
             # (sysfs "0000:82:00.0" vs nvidia-smi "00000000:82:00.0")
             pci_suffix = gpu.pci_address.lower().split(":")[-2] + ":" + gpu.pci_address.lower().split(":")[-1]
+            gpu.nvidia_index = nv_index.get(pci_suffix)
             for key, procs in all_processes.items():
                 if key == "" and len(all_processes) == 1:
                     gpu.processes = procs
@@ -563,6 +590,21 @@ def _format_stats_line(gpu: GPU) -> str:
     return ""
 
 
+def _id_tag(gpu: GPU) -> str:
+    """Compact identity tag: canonical PCI bus + nvidia-smi index.
+
+    Resolves the confusion between the kernel DRM 'cardN' number (probe order,
+    what this tool lists) and the bus-sorted 'GPU N' index reported by
+    nvidia-smi. The PCI bus id is the only stable, unambiguous identifier.
+    """
+    parts = []
+    if gpu.pci_address:
+        parts.append("PCI " + ":".join(gpu.pci_address.lower().split(":")[-2:]))
+    if gpu.nvidia_index is not None:
+        parts.append(f"nvidia-smi GPU{gpu.nvidia_index}")
+    return ("  [" + " | ".join(parts) + "]") if parts else ""
+
+
 def print_gpus(gpus: List[GPU], show_all: bool = False):
     """Print GPU information."""
     print("GRAPHICS CARDS")
@@ -570,7 +612,7 @@ def print_gpus(gpus: List[GPU], show_all: bool = False):
     print()
 
     for gpu in gpus:
-        print(f"  {gpu.card}: {gpu.name}")
+        print(f"  {gpu.card}: {gpu.name}{_id_tag(gpu)}")
 
         # Details line
         details = f"         Driver: {gpu.driver}"
@@ -620,7 +662,7 @@ def print_short(gpus: List[GPU]):
         elif gpu.amd_stats:
             s = gpu.amd_stats
             stats = f" [{s.gpu_util}% {s.temperature}\u00b0C {s.power_draw:.0f}W]"
-        print(f"  {gpu.card}: {gpu.name} | {gpu.driver} {vram} | {n_conn}/{n_total} outputs{stats}")
+        print(f"  {gpu.card}: {gpu.name}{_id_tag(gpu)} | {gpu.driver} {vram} | {n_conn}/{n_total} outputs{stats}")
 
 
 def watch_gpus(interval=2):
@@ -756,6 +798,7 @@ license: GPL-2.0""",
                 "card": gpu.card,
                 "name": gpu.name,
                 "pci_address": gpu.pci_address,
+                "nvidia_index": gpu.nvidia_index,
                 "driver": gpu.driver,
                 "vram_gb": round(gpu.vram_gb, 1),
                 "outputs": [],

@@ -5,6 +5,7 @@
 """Tests unitaires pour lsgpu."""
 import json
 import os
+import re
 import subprocess
 import sys
 import unittest
@@ -121,6 +122,42 @@ class TestCLI(unittest.TestCase):
         if r.returncode == 0:
             # With -a, disconnected ports should show
             self.assertGreater(len(r.stdout), 0)
+
+
+class TestVersionConsistency(unittest.TestCase):
+    """Garde-fou anti-récidive : les 4 déclarations de version doivent rester
+    synchronisées. Sinon `lsgpus --version` ment et les paquets sont
+    incohérents. Voir RELEASING.md (oubli classique sur __version__ et la
+    page de man)."""
+
+    def _read(self, relpath):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, relpath), encoding="utf-8") as f:
+            return f.read()
+
+    def _grep(self, relpath, pattern, label):
+        m = re.search(pattern, self._read(relpath), re.M)
+        self.assertIsNotNone(m, f"{label}: version introuvable dans {relpath}")
+        return m.group(1)
+
+    def test_all_version_sources_match(self):
+        versions = {
+            "lsgpu.py (__version__)":
+                self._grep("lsgpu.py", r'^__version__\s*=\s*["\']([^"\']+)["\']', "__version__"),
+            "setup.py":
+                self._grep("setup.py", r'version\s*=\s*["\']([^"\']+)["\']', "setup.py"),
+            "lsgpus.1 (.TH)":
+                self._grep("lsgpus.1", r'"lsgpus\s+([0-9][0-9.]*)"', "man .TH"),
+            "debian/changelog":
+                self._grep("debian/changelog", r'^\S+\s+\(([0-9][0-9.]*)-\d+\)', "changelog"),
+            "CHANGELOG.md":
+                self._grep("CHANGELOG.md", r'^##\s+([0-9][0-9.]*)', "CHANGELOG.md"),
+        }
+        self.assertEqual(
+            len(set(versions.values())), 1,
+            "Versions désynchronisées -> " +
+            ", ".join(f"{k}={v}" for k, v in versions.items()),
+        )
 
 
 if __name__ == "__main__":

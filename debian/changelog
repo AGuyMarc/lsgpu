@@ -1,3 +1,15 @@
+lsgpus (0.2.1-1) unstable; urgency=medium
+
+  * New upstream release 0.2.1 — see CHANGELOG.md for the full list of software
+    changes (each card now shows its PCI bus id + nvidia-smi GPU index).
+  * Packaging: declare the license as the SPDX expression GPL-2.0-or-later and
+    drop the deprecated "License :: OSI Approved ::" classifier in setup.py
+    (aligns with the SPDX headers already in the sources).
+  * Packaging: the project's canonical changelog now lives in CHANGELOG.md at
+    the repo root; this debian/changelog tracks packaging changes only.
+
+ -- Guy-Marc APRIN <2026@gm.casa>  Fri, 29 May 2026 22:19:09 +0200
+
 lsgpus (0.2.0-1) unstable; urgency=medium
 
   * Rename installed binary from /usr/bin/lsgpu to /usr/bin/lsgpus and
