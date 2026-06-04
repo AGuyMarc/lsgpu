@@ -45,7 +45,7 @@ except ImportError:
     sys.exit(1)
 from typing import List, Optional, Dict
 
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 
 def _get_version_string() -> str:
     """Build version string with build date from git or file modification time."""
@@ -696,11 +696,11 @@ def watch_gpus(interval=2):
             gpus = scan_gpus()
             for gpu in gpus:
                 # Extract short name from bracket notation (e.g. "[GeForce RTX 4090]")
-                name_short = gpu.name.split("[")[-1].rstrip("]") if "[" in gpu.name else gpu.name
+                card_name = gpu.name  # nom complet (l'ancienne troncature laissait un "]" orphelin)
 
                 has_stats = gpu.nvidia_stats or gpu.amd_stats
                 if not has_stats:
-                    print(f"  {gpu.card} {name_short} ({gpu.driver})")
+                    print(f"  {gpu.card} {card_name} ({gpu.driver})")
                     continue
 
                 if gpu.nvidia_stats:
@@ -734,7 +734,7 @@ def watch_gpus(interval=2):
                 mem_filled = int(mem_pct / 100 * bar_w)
                 mem_bar = "\u2588" * mem_filled + "\u2591" * (bar_w - mem_filled)
 
-                print(f"  {gpu.card} {name_short}")
+                print(f"  {gpu.card} {card_name}")
                 print(f"    GPU  [{gpu_bar}] {util:3d}%  {spark}    ")
                 print(f"    MEM  [{mem_bar}] {mem_used}/{mem_total}MB ({mem_pct:.0f}%)    ")
                 print(f"    TEMP {temp}\u00b0C   POWER {power:.1f}W    ")

@@ -1,7 +1,7 @@
 .\" SPDX-License-Identifier: GPL-2.0-or-later
 .\" Copyright (C) 2026 Guy-Marc APRIN <2026@gm.casa>
 .\" NB: contact email rotates yearly - 2027@gm.casa in 2027, etc.
-.TH LSGPUS 1 "2026-06-04" "lsgpus 0.2.2" "User Commands"
+.TH LSGPUS 1 "2026-06-04" "lsgpus 0.2.3" "User Commands"
 .SH NAME
 lsgpus \- list graphics cards with details, outputs, and connected monitors
 .SH SYNOPSIS
@@ -67,6 +67,33 @@ For each GPU: card name, full GPU model, driver, VRAM size, and NVIDIA runtime
 stats (utilization %, memory used/total, temperature, power draw).
 Below each GPU, output ports are listed with connection status and connected
 monitor details.
+.PP
+In
+.B \-\-watch
+mode the same data is redrawn in place, with a utilization progress bar and a
+rolling sparkline per card \(em e.g. while a model loads on card1 via Ollama:
+.PP
+.RS 3n
+.nf
+.ft CW
+GPU MONITOR \(em 14:21:19 (Ctrl+C to stop)
+
+  card0 NVIDIA Corporation GA107 [GeForce RTX 3050 6GB] (rev a1)
+    GPU  [██████░░░░░░░░░░░░░░░░░░░░░░░░]  21%  ▁▁▂▄▁▂▂▁▁▁▁▂▁▁▁▁▃▁▂
+    MEM  [███████████████████████░░░░░░░] 4890/6144MB (80%)
+    TEMP 43°C   POWER 15.8W
+
+  card1 NVIDIA Corporation AD106 [GeForce RTX 4060 Ti] (rev a1)
+    GPU  [█████████████████████████████░]  98%  ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇
+    MEM  [██████████░░░░░░░░░░░░░░░░░░░░] 5661/16380MB (35%)
+    TEMP 65°C   POWER 136.2W
+    └ PID 1965377  python  122MB
+    └ PID 2733331  ollama  5498MB
+
+  card2 Intel Corporation Arrow Lake-S [Intel Graphics] (rev 06) (i915)
+.ft
+.fi
+.RE
 .SH EXAMPLES
 .nf
 .B lsgpus

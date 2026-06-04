@@ -7,6 +7,15 @@ All notable changes to **lsgpus**. This is the canonical upstream changelog;
 > trailing `s`) since 0.2.0. The GitHub repository and the Python module stay
 > `lsgpu`.
 
+## 0.2.3 — 2026-06-04
+
+* watch: show the **full card name** in `--watch` headers. The previous code
+  kept only the bracketed model and left a dangling `]`
+  (e.g. `GeForce RTX 3050 6GB] (rev a1)`); it now shows the complete name.
+* docs(README): add an animated demo of `lsgpus --watch` during an Ollama run
+  (VRAM climbing, GPU pegged, process list) in the real-time monitoring section.
+* docs(man): add a static sample of a `--watch` frame to the OUTPUT section.
+
 ## 0.2.2 — 2026-06-04
 
 * docs(man): document the two options that were missing from the man page —

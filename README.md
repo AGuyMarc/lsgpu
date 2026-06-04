@@ -131,6 +131,8 @@ lsgpus --watch 5      # 5 s interval (gentler on the system)
 # press Ctrl+C to stop (there is no quit key; Esc / q / Ctrl+D do nothing)
 ```
 
+![lsgpus --watch during an Ollama run: VRAM climbing and the RTX 4060 Ti pegged at 98%, while a second model runs on the RTX 3050](docs/lsgpus-watch.gif)
+
 In a typical local-AI workflow that looks like: launch `lsgpus --watch` in a side terminal, start `ollama run <model>` in another, see the VRAM of the chosen card climb to its plateau, then watch the utilization sparkline pulse as each generation runs.
 
 ## Features
