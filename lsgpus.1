@@ -1,7 +1,7 @@
 .\" SPDX-License-Identifier: GPL-2.0-or-later
 .\" Copyright (C) 2026 Guy-Marc APRIN <2026@gm.casa>
-.\" NB: contact email rotates yearly — 2027@gm.casa in 2027, etc.
-.TH LSGPUS 1 "2026-05-29" "lsgpus 0.2.1" "User Commands"
+.\" NB: contact email rotates yearly - 2027@gm.casa in 2027, etc.
+.TH LSGPUS 1 "2026-06-04" "lsgpus 0.2.2" "User Commands"
 .SH NAME
 lsgpus \- list graphics cards with details, outputs, and connected monitors
 .SH SYNOPSIS
@@ -48,6 +48,13 @@ Output all GPU information as JSON.
 .B \-\-short\fR, \fB\-s
 Compact output with one line per GPU.
 .TP
+.B \-\-all\fR, \fB\-a
+Show all output ports, including disconnected ones (hidden by default).
+.TP
+.B \-\-watch\fR, \fB\-w\fR [\fISEC\fR]
+Continuously refresh the listing in place every \fISEC\fR seconds (default 2),
+showing live NVIDIA stats. Press \fBCtrl+C\fR to stop \(em there is no quit key.
+.TP
 .B \-\-version\fR, \fB\-V
 Show version number and exit.
 .TP
@@ -64,6 +71,9 @@ monitor details.
 .nf
 .B lsgpus
 .B lsgpus \-\-short
+.B lsgpus \-\-all
+.B lsgpus \-\-watch
+.B lsgpus \-\-watch 5
 .B lsgpus \-\-json
 .B lsgpus \-\-json | jq '.[].name'
 .fi

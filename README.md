@@ -128,6 +128,7 @@ For real-time monitoring — watching a model load, diagnosing a sudden inferenc
 ```bash
 lsgpus --watch        # default 2 s interval
 lsgpus --watch 5      # 5 s interval (gentler on the system)
+# press Ctrl+C to stop (there is no quit key; Esc / q / Ctrl+D do nothing)
 ```
 
 In a typical local-AI workflow that looks like: launch `lsgpus --watch` in a side terminal, start `ollama run <model>` in another, see the VRAM of the chosen card climb to its plateau, then watch the utilization sparkline pulse as each generation runs.
@@ -186,6 +187,8 @@ sudo chmod +x /usr/local/bin/lsgpus
 ```bash
 lsgpus              # Full output
 lsgpus --short      # Compact one-line-per-GPU
+lsgpus --all        # Include disconnected outputs
+lsgpus --watch      # Real-time monitoring (Ctrl+C to stop)
 lsgpus --json       # JSON output
 ```
 

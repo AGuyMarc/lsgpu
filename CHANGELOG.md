@@ -7,6 +7,13 @@ All notable changes to **lsgpus**. This is the canonical upstream changelog;
 > trailing `s`) since 0.2.0. The GitHub repository and the Python module stay
 > `lsgpu`.
 
+## 0.2.2 — 2026-06-04
+
+* docs(man): document the two options that were missing from the man page —
+  `--all`/`-a` (show disconnected outputs) and `--watch`/`-w [SEC]` (live
+  in-place refresh; stop with **Ctrl+C** — there is no quit key). Add matching
+  EXAMPLES. The man had drifted behind the binary.
+
 ## 0.2.1 — 2026-05-29
 
 * Show the canonical **PCI bus id** and the **nvidia-smi GPU index** next to
