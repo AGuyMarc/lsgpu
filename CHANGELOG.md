@@ -7,6 +7,14 @@ All notable changes to **lsgpus**. This is the canonical upstream changelog;
 > trailing `s`) since 0.2.0. The GitHub repository and the Python module stay
 > `lsgpu`.
 
+## 0.2.4 — 2026-06-04
+
+* watch: the `--watch` header now carries the same identity as the default
+  listing — the canonical PCI bus id + nvidia-smi GPU index
+  (`[PCI 02:00.0 | nvidia-smi GPU0]`) and the `Driver:` line. These were only
+  in the non-watch output before; nothing is lost in watch mode anymore.
+* docs: refresh the README demo GIF and the man OUTPUT sample to the new header.
+
 ## 0.2.3 — 2026-06-04
 
 * watch: show the **full card name** in `--watch` headers. The previous code

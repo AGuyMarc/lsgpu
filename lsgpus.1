@@ -1,7 +1,7 @@
 .\" SPDX-License-Identifier: GPL-2.0-or-later
 .\" Copyright (C) 2026 Guy-Marc APRIN <2026@gm.casa>
 .\" NB: contact email rotates yearly - 2027@gm.casa in 2027, etc.
-.TH LSGPUS 1 "2026-06-04" "lsgpus 0.2.3" "User Commands"
+.TH LSGPUS 1 "2026-06-04" "lsgpus 0.2.4" "User Commands"
 .SH NAME
 lsgpus \- list graphics cards with details, outputs, and connected monitors
 .SH SYNOPSIS
@@ -76,21 +76,25 @@ rolling sparkline per card \(em e.g. while a model loads on card1 via Ollama:
 .RS 3n
 .nf
 .ft CW
-GPU MONITOR \(em 14:21:19 (Ctrl+C to stop)
+GPU MONITOR \(em 15:26:01 (Ctrl+C to stop)
 
-  card0 NVIDIA Corporation GA107 [GeForce RTX 3050 6GB] (rev a1)
-    GPU  [██████░░░░░░░░░░░░░░░░░░░░░░░░]  21%  ▁▁▂▄▁▂▂▁▁▁▁▂▁▁▁▁▃▁▂
-    MEM  [███████████████████████░░░░░░░] 4890/6144MB (80%)
-    TEMP 43°C   POWER 15.8W
+  card0: NVIDIA Corporation GA107 [GeForce RTX 3050 6GB] (rev a1)  [PCI 82:00.0 | nvidia-smi GPU1]
+    Driver: nvidia
+    GPU  [░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]   0%  ▁▁▁▄▂▁
+    MEM  [█████████████████░░░░░░░░░░░░░] 3608/6144MB (59%)
+    TEMP 43°C   POWER 28.1W
 
-  card1 NVIDIA Corporation AD106 [GeForce RTX 4060 Ti] (rev a1)
-    GPU  [█████████████████████████████░]  98%  ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇
-    MEM  [██████████░░░░░░░░░░░░░░░░░░░░] 5661/16380MB (35%)
-    TEMP 65°C   POWER 136.2W
+  card1: NVIDIA Corporation AD106 [GeForce RTX 4060 Ti] (rev a1)  [PCI 02:00.0 | nvidia-smi GPU0]
+    Driver: nvidia
+    GPU  [█████████████████████████████░]  98%  ▇▇▇▇▇▇
+    MEM  [████████████████████████░░░░░░] 13158/16380MB (80%)
+    TEMP 62°C   POWER 123.2W
     └ PID 1965377  python  122MB
     └ PID 2733331  ollama  5498MB
+    └ PID 2775015  ollama  7492MB
 
-  card2 Intel Corporation Arrow Lake-S [Intel Graphics] (rev 06) (i915)
+  card2: Intel Corporation Arrow Lake-S [Intel Graphics] (rev 06)  [PCI 00:02.0]
+    Driver: i915
 .ft
 .fi
 .RE

@@ -1,3 +1,10 @@
+lsgpus (0.2.4-1) unstable; urgency=medium
+
+  * New upstream release 0.2.4; see CHANGELOG.md for the upstream changes.
+    No Debian packaging changes.
+
+ -- Guy-Marc APRIN <2026@gm.casa>  Thu, 04 Jun 2026 17:01:28 +0200
+
 lsgpus (0.2.3-1) unstable; urgency=medium
 
   * New upstream release 0.2.3; see CHANGELOG.md for the upstream changes.
