@@ -690,8 +690,8 @@ def watch_gpus(interval=2):
             # ANSI cursor home — overwrite previous frame without clearing
             print("\033[H", end="")
             ts = datetime.now().strftime("%H:%M:%S")
-            print(f"GPU MONITOR \u2014 {ts} (Ctrl+C to stop)    ")
-            print()
+            print(f"GPU MONITOR \u2014 {ts} (Ctrl+C to stop)\033[K")
+            print("\033[K")
 
             gpus = scan_gpus()
             for gpu in gpus:
@@ -699,8 +699,8 @@ def watch_gpus(interval=2):
 
                 has_stats = gpu.nvidia_stats or gpu.amd_stats
                 if not has_stats:
-                    print(f"  {gpu.card}: {card_name}{_id_tag(gpu)}")
-                    print(f"    Driver: {gpu.driver}")
+                    print(f"  {gpu.card}: {card_name}{_id_tag(gpu)}\033[K")
+                    print(f"    Driver: {gpu.driver}\033[K")
                     continue
 
                 if gpu.nvidia_stats:
@@ -734,19 +734,22 @@ def watch_gpus(interval=2):
                 mem_filled = int(mem_pct / 100 * bar_w)
                 mem_bar = "\u2588" * mem_filled + "\u2591" * (bar_w - mem_filled)
 
-                print(f"  {gpu.card}: {card_name}{_id_tag(gpu)}")
-                print(f"    Driver: {gpu.driver}")
-                print(f"    GPU  [{gpu_bar}] {util:3d}%  {spark}    ")
-                print(f"    MEM  [{mem_bar}] {mem_used}/{mem_total}MB ({mem_pct:.0f}%)    ")
-                print(f"    TEMP {temp}\u00b0C   POWER {power:.1f}W    ")
+                print(f"  {gpu.card}: {card_name}{_id_tag(gpu)}\033[K")
+                print(f"    Driver: {gpu.driver}\033[K")
+                print(f"    GPU  [{gpu_bar}] {util:3d}%  {spark}\033[K")
+                print(f"    MEM  [{mem_bar}] {mem_used}/{mem_total}MB ({mem_pct:.0f}%)\033[K")
+                print(f"    TEMP {temp}\u00b0C   POWER {power:.1f}W\033[K")
 
                 # Show processes in watch mode too
                 if gpu.processes:
                     for proc in gpu.processes:
                         pname = os.path.basename(proc.name) if proc.name else "?"
-                        print(f"    \u2514 PID {proc.pid}  {pname}  {proc.used_memory_mb}MB    ")
-                print()
+                        print(f"    \u2514 PID {proc.pid}  {pname}  {proc.used_memory_mb}MB\033[K")
+                print("\033[K")
 
+            # Erase anything left below the frame (e.g. a GPU/process that
+            # disappeared, or pre-existing terminal text the frame didn't cover).
+            print("\033[J", end="")
             time.sleep(interval)
     except KeyboardInterrupt:
         print("\nMonitoring stopped.")
