@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name="lsgpus",
-    version="0.2.4",
+    version="0.2.5",
     description="List GPUs with details — like lscpu/lsusb but for graphics cards",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",

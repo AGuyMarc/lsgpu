@@ -7,6 +7,13 @@ All notable changes to **lsgpus**. This is the canonical upstream changelog;
 > trailing `s`) since 0.2.0. The GitHub repository and the Python module stay
 > `lsgpu`.
 
+## 0.2.5 — 2026-07-28
+
+* watch: clear the frame with ANSI erase sequences instead of trailing-space
+  padding. Each row now erases to end-of-line and the bottom of the frame
+  erases to end-of-screen, so a shrinking frame (a GPU or process that
+  disappeared) or pre-existing terminal text below it no longer lingers.
+
 ## 0.2.4 — 2026-06-04
 
 * watch: the `--watch` header now carries the same identity as the default
