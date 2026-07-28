@@ -685,9 +685,16 @@ def watch_gpus(interval=2):
 
     # ANSI: clear screen + cursor home on first frame only
     print("\033[2J\033[H", end="")
+    # Per-frame refresh without a flickering full clear. ANSI/VT100 codes used
+    # below (\033 = ESC, "[" = CSI, Control Sequence Introducer):
+    #   \033[H  cursor home (top-left) — redraw over the previous frame
+    #   \033[K  erase from cursor to end of line   — wipe the tail when a line
+    #           became shorter (this replaces the old trailing-space padding)
+    #   \033[J  erase from cursor to end of screen — wipe anything below the
+    #           frame (a GPU/process that vanished, or text present beforehand)
     try:
         while True:
-            # ANSI cursor home — overwrite previous frame without clearing
+            # cursor home — overwrite previous frame without clearing
             print("\033[H", end="")
             ts = datetime.now().strftime("%H:%M:%S")
             print(f"GPU MONITOR \u2014 {ts} (Ctrl+C to stop)\033[K")
