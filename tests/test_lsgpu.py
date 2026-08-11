@@ -144,8 +144,8 @@ class TestVersionConsistency(unittest.TestCase):
         versions = {
             "lsgpu.py (__version__)":
                 self._grep("lsgpu.py", r'^__version__\s*=\s*["\']([^"\']+)["\']', "__version__"),
-            "setup.py":
-                self._grep("setup.py", r'version\s*=\s*["\']([^"\']+)["\']', "setup.py"),
+            "pyproject.toml":
+                self._grep("pyproject.toml", r'^version\s*=\s*["\']([^"\']+)["\']', "pyproject.toml"),
             "lsgpus.1 (.TH)":
                 self._grep("lsgpus.1", r'"lsgpus\s+([0-9][0-9.]*)"', "man .TH"),
             "debian/changelog":
