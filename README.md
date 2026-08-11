@@ -175,6 +175,19 @@ Package page: https://aur.archlinux.org/packages/lsgpu-git
 
 (The AUR package name may follow the binary rename to `lsgpus-git` after seraf1's next update — check the AUR page for the current name.)
 
+### Fedora (COPR)
+
+Available from the [`ls-tools` COPR repository](https://copr.fedorainfracloud.org/coprs/guy-marc-aprin/ls-tools/):
+
+```bash
+sudo dnf copr enable guy-marc-aprin/ls-tools
+sudo dnf install lsgpus
+```
+
+Builds are provided for Fedora 43, 44 and rawhide (x86_64). The Fedora package is
+named `lsgpus`. Enabling the COPR also gives you `lsdisplay` (the companion
+display-listing tool).
+
 ### From source
 
 ```bash
