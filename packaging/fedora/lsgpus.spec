@@ -64,6 +64,8 @@ install -Dpm 0644 lsgpus.1 %{buildroot}%{_mandir}/man1/lsgpus.1
 %{_mandir}/man1/lsgpus.1*
 
 %changelog
+* Sat Aug 22 2026 Guy-Marc APRIN <2026@gm.casa> - 0.2.6-1
+- Aligne sur la release GitHub v0.2.6 (migration build vers pyproject.toml, PEP 517/518).
 * Tue Jul 28 2026 Guy-Marc APRIN <2026@gm.casa> - 0.2.5-1
 - Aligne sur la release GitHub v0.2.5 (fix rendu --watch : effacement ANSI).
 * Fri Jul 03 2026 Guy-Marc APRIN <2026@gm.casa> - 0.2.4-1

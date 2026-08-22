@@ -13,7 +13,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lsgpus"
-version = "0.2.5"
+version = "0.2.6"
 description = "List GPUs with details — like lscpu/lsusb but for graphics cards"
 readme = "README.md"
 requires-python = ">=3.7"

@@ -7,6 +7,11 @@ All notable changes to **lsgpus**. This is the canonical upstream changelog;
 > trailing `s`) since 0.2.0. The GitHub repository and the Python module stay
 > `lsgpu`.
 
+## 0.2.6 — 2026-08-22
+
+* build: migrate to `pyproject.toml` (PEP 517/518); `setup.py` dropped.
+* packaging: Fedora COPR spec and "Fedora (COPR)" install docs added.
+
 ## 0.2.5 — 2026-07-28
 
 * watch: clear the frame with ANSI erase sequences instead of trailing-space
