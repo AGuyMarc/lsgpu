@@ -146,6 +146,20 @@ In a typical local-AI workflow that looks like: launch `lsgpus --watch` in a sid
 
 ## Installation
 
+### PyPI (any distribution, macOS, Windows)
+
+Cross-platform, no root needed — installs into an isolated environment with
+[pipx](https://pipx.pypa.io):
+
+```bash
+pipx install lsgpus
+```
+
+(`pip install --user lsgpus` also works.) Pure Python 3, no mandatory
+dependencies. The external tools it reads (`nvidia-smi`, `rocm-smi`, sysfs) must
+already be present, as with any install method. The PyPI project is named
+`lsgpus` (the `lsgpu` name was already taken by an unrelated package).
+
 ### Debian / Ubuntu (.deb)
 
 Download the `.deb` from the [Releases page](https://github.com/AGuyMarc/lsgpu/releases/latest), then:

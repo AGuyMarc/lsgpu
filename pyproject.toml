@@ -29,6 +29,12 @@ classifiers = [
     "Topic :: Utilities",
 ]
 
+[project.urls]
+Homepage = "https://github.com/AGuyMarc/lsgpu"
+Repository = "https://github.com/AGuyMarc/lsgpu"
+Issues = "https://github.com/AGuyMarc/lsgpu/issues"
+Changelog = "https://github.com/AGuyMarc/lsgpu/blob/main/CHANGELOG.md"
+
 [project.scripts]
 lsgpus = "lsgpu:main"
 
