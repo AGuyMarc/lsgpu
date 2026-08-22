@@ -41,6 +41,29 @@ nvidia-smi / rocm-smi / sysfs expose).}
 # La tarball GitHub du depot "lsgpu" se deplie dans lsgpu-%%{version}/
 %autosetup -n lsgpu-%{version}
 
+%if 0%{?el9}
+# EPEL 9 fournit setuptools < 61, incapable de builder un paquet pyproject [project].
+# lsgpus est un script mono-fichier (module lsgpu.py) : on l'installe directement,
+# sous le nom binaire "lsgpus". Shebang env -> /usr/bin/python3 (proprete + dep auto).
+
+%build
+# rien a compiler
+
+%install
+sed -e '1s|^#!.*|#!/usr/bin/python3|' lsgpu.py > lsgpus.bin
+install -Dpm 0755 lsgpus.bin %{buildroot}%{_bindir}/lsgpus
+install -Dpm 0644 lsgpus.1 %{buildroot}%{_mandir}/man1/lsgpus.1
+
+%check
+%{python3} -m unittest discover -s tests -v ||:
+
+%files
+%license LICENSE
+%doc README.md
+%{_bindir}/lsgpus
+%{_mandir}/man1/lsgpus.1*
+
+%else
 %generate_buildrequires
 %pyproject_buildrequires
 
@@ -62,6 +85,7 @@ install -Dpm 0644 lsgpus.1 %{buildroot}%{_mandir}/man1/lsgpus.1
 %doc README.md
 %{_bindir}/lsgpus
 %{_mandir}/man1/lsgpus.1*
+%endif
 
 %changelog
 * Sat Aug 22 2026 Guy-Marc APRIN <2026@gm.casa> - 0.2.6-1
