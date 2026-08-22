@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Paquet Fedora/COPR — lsgpus (Guy-Marc APRIN)
-# Cale sur la derniere release publiee : v0.2.5 (2026-07-28).
+# Cale sur la derniere release publiee : v0.2.6 (2026-08-22).
 #
 # ATTENTION aux noms (asymetrie voulue) :
 #   - depot GitHub          : lsgpu   (nom inchange, preserve les liens AUR/LinuxFr)
@@ -11,7 +11,7 @@
 # => la tarball GitHub se deplie dans lsgpu-<version>/ (nom du DEPOT), d'ou le -n ci-dessous.
 
 Name:           lsgpus
-Version:        0.2.5
+Version:        0.2.6
 Release:        1%{?dist}
 Summary:        List GPUs with details — like lscpu/lsusb but for graphics cards
 
@@ -41,9 +41,9 @@ nvidia-smi / rocm-smi / sysfs expose).}
 # La tarball GitHub du depot "lsgpu" se deplie dans lsgpu-%%{version}/
 %autosetup -n lsgpu-%{version}
 
-%if 0%{?el9}
-# EPEL 9 fournit setuptools < 61, incapable de builder un paquet pyproject [project].
-# lsgpus est un script mono-fichier (module lsgpu.py) : on l'installe directement,
+%if 0%{?el9} || 0%{?suse_version}
+# EPEL 9 (setuptools < 61) et openSUSE (macros %%pyproject_* absentes/variables selon
+# Leap vs Tumbleweed) : on installe directement le script mono-fichier (module lsgpu.py),
 # sous le nom binaire "lsgpus". Shebang env -> /usr/bin/python3 (proprete + dep auto).
 
 %build
