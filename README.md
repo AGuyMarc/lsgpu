@@ -188,6 +188,22 @@ Builds are provided for Fedora 43, 44 and rawhide (x86_64). The Fedora package i
 named `lsgpus`. Enabling the COPR also gives you `lsdisplay` (the companion
 display-listing tool).
 
+Updates come with the system: `sudo dnf upgrade` picks up new releases automatically
+once the COPR is enabled. To remove the repository later:
+
+```bash
+sudo dnf copr remove guy-marc-aprin/ls-tools
+```
+
+**RHEL / Rocky / AlmaLinux / CentOS Stream** — the same COPR works; just enable the
+COPR plugin first:
+
+```bash
+sudo dnf install dnf-plugins-core
+sudo dnf copr enable guy-marc-aprin/ls-tools
+sudo dnf install lsgpus
+```
+
 ### From source
 
 ```bash
